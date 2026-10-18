@@ -1,0 +1,57 @@
+{
+  "checked_at_utc": "2026-10-18T16:07:31+00:00",
+  "scope": "Debian 13 trixie-backports, amd64, cloud-amd64 flavour",
+  "apt_indexes": "Refreshed with apt-get update; packages selected from authenticated Debian APT indexes",
+  "debian_source": {
+    "package": "linux-source-7.2",
+    "source_package": "linux",
+    "version": "7.2.9-1~bpo13+1",
+    "deb_url": "https://deb.debian.org/debian/pool/main/l/linux/linux-source-7.2_7.2.9-1~bpo13+1_all.deb",
+    "deb_sha256": "58d75ac2c2925c71447d039cfb4f7a1f3c0053fbcc0d78c4822538f1a3f5e9c5",
+    "tar_sha256": "29f9eafc0826dcc54ff9ace28a326c265f4752c22f57a87027446b5353451f25"
+  },
+  "debian_cloud_config": {
+    "package": "linux-config-7.2",
+    "source_package": "linux",
+    "version": "7.2.9-1~bpo13+1",
+    "deb_url": "https://deb.debian.org/debian/pool/main/l/linux/linux-config-7.2_7.2.9-1~bpo13+1_amd64.deb",
+    "deb_sha256": "4c687724eada827c85fc73e8421e288f870a631f14ca8a0929bc66690910f93e",
+    "member": "usr/src/linux-config-7.2/config.amd64_none_cloud-amd64.xz",
+    "decompressed_sha256": "7507099cdcba1b1477078222b31fb1b13d8be1f2b9e20c411939e7a0cf91f484",
+    "saved_official_file": "local-build/debian13-cloud-amd64.official.config",
+    "custom_file": "local-build/debian13-cloud-amd64-bbrv3.config",
+    "custom_sha256": "e7f610eccc95dc5b253a0f0b31ae1e6acb7462148adf25236dca50ec12e69467",
+    "allowed_config_differences": [
+      "CONFIG_LOCALVERSION",
+      "CONFIG_MODULE_SIG_KEY",
+      "CONFIG_SYSTEM_TRUSTED_KEYS",
+      "CONFIG_MODULE_SIG_ALL"
+    ]
+  },
+  "published_cloud_meta_at_check": {
+    "package": "linux-image-cloud-amd64",
+    "backports_version": "7.2.6-1~bpo13+1",
+    "note": "Published image meta lags available 7.2.9 source/config; no claim of a Debian-signed 7.2.9 cloud image."
+  },
+  "google_bbr": {
+    "repository": "https://github.com/google/bbr",
+    "branch": "v3",
+    "commit": "90210de4b779d40496dee0b89081780eeddf2a60",
+    "base_version": "6.13.7",
+    "tcp_bbr_c_sha256": "04ba1e8b436b88eb0716f3d2a64a9be5a5d946ba3169a590d7bb533c320bdc51"
+  },
+  "port": {
+    "patch": "local-build/bbrv3-debian-7.2.9.patch",
+    "patch_sha256": "b6d9384a5eaad6e7239032d4d893801f688d7e574add00a8d80b2060ccc27903",
+    "already_applied": true,
+    "generic_port_commit": "80c31f6dc34729edc929e8ba778ca947c5cecbfe"
+  },
+  "cloud_target": {
+    "kernel_release": "7.2.9-deb13-cloud-bbrv3",
+    "deb_version": "7.2.9-1~bpo13+1+cloudbbrv3.1",
+    "cloud_compiled": false,
+    "cloud_installed": false,
+    "cloud_boot_tested": false,
+    "validation_scope": "Static source/config checks only. Generic-configuration boot results do not validate the cloud configuration."
+  }
+}

@@ -13,8 +13,11 @@
 
 The first repository commit imports the full Debian source snapshot. Its root
 .gitignore is adjusted to remove Debian packaging's ignore-everything rule.
-The following commit records the BBR port, config and documentation. No claim
-of upstream history or official Debian/Google release status is intended.
+The following commit records the BBR port, config and documentation. The
+cloud-bbrv3 branch then selects the official cloud configuration from the
+matching Debian linux-config-7.2 package. Cloud and generic flavours share
+this same Debian source; no extra TCP changes are needed just for the flavour.
+No claim of upstream history or official Debian/Google release status is intended.
 
 ## Changes
 
@@ -43,34 +46,56 @@ under every loss/reordering/ECN condition. Those paths require runtime tests.
 
 ## Configuration
 
-The saved config starts from Debian's config-7.2.6+deb13-amd64. Most hardware
-and software features are retained; localmodconfig was not used. Main changes:
+This branch uses config.amd64_none_cloud-amd64.xz from Debian linux-config-7.2
+7.2.9-1~bpo13+1. Its unmodified, decompressed copy is tracked alongside the
+custom configuration. SHA256:
+7507099cdcba1b1477078222b31fb1b13d8be1f2b9e20c411939e7a0cf91f484.
 
-- CONFIG_LOCALVERSION="-deb13-bbrv3"; automatic Git suffix disabled.
-- BBR remains a module and still uses the congestion-control name "bbr".
-- Disable debug info, BTF and Rust to fit a small build VPS.
-- Clear distribution certificate paths; keep module signing with a local key.
-- No kernel installation, bootloader edits or runtime sysctl changes performed.
+Only four configuration values differ from that official cloud input:
 
-Disabling BTF reduces BPF CO-RE/observability functionality; disabling Rust
-removes Rust-dependent drivers. This is not Debian's signed Secure Boot kernel.
+- CONFIG_LOCALVERSION="-deb13-cloud-bbrv3".
+- CONFIG_MODULE_SIG_KEY="certs/signing_key.pem" (generate a local key).
+- CONFIG_SYSTEM_TRUSTED_KEYS="" (no distribution certificate file dependency).
+- CONFIG_MODULE_SIG_ALL=y (sign modules during modules_install).
 
-## Validation completed
+Preserve official debug info, BTF, module BTF, Rust, virtio and cloud driver
+choices. No localmodconfig or additional driver pruning is used. BBR remains
+a module and still uses the congestion-control name "bbr". Official build-time
+cubic/fq_codel defaults are retained. No running sysctl is changed.
 
-- `git diff --check`.
+The generic main branch previously disabled debug info, BTF and Rust to fit
+the small VPS. That configuration is not used here. Lack of BTF on that old
+variant coincided with a systemd bpf-restrict-fs load error; enabling BTF here
+is not by itself proof that the error is resolved without a new boot test.
+This is not Debian's signed Secure Boot kernel. No private key is committed.
+
+## Validation boundaries
+
+For this cloud branch, only static source/config checks are performed:
+
+- Reverse application check for the saved BBR patch.
+- Configuration input hash, allowed-difference and critical-feature tests.
+- Configuration checker rejects BTF or Rust silently disappearing.
+- Whitespace and repository-artifact checks.
+
+There is no cloud build, link, modpost, package, module-load or boot test yet.
+The expected cloud release is 7.2.9-deb13-cloud-bbrv3. Configuration normalization
+must be performed on the build machine with the real BTF/Rust dependencies;
+it has not been simulated using fake tools on the original VPS.
+
+Earlier validation of this same TCP port with the generic configuration:
+
 - Individual compilation of tcp_bbr.o, tcp_input.o, tcp_output.o, tcp_timer.o,
-  tcp.o, tcp_cong.o and bpf_tcp_ca.o with the saved config and GCC 14.
-- Kernel release resolves to 7.2.9-deb13-bbrv3.
-- The diagnostic verifier on the old official kernel sees only the old 20-byte
-  BBR info structure and correctly does not claim BBRv3.
+  tcp.o, tcp_cong.o and bpf_tcp_ca.o with GCC 14.
+- The original VPS full build was stopped for migration; the user later built
+  the generic image on another machine and uploaded the image package.
+- That generic image was installed and booted on the original VPS. The running
+  release was 7.2.9-deb13-bbrv3; tcp_bbr module metadata and a fresh loopback
+  TCP_CC_INFO query both reported BBR version 3.
 
-## Not completed
-
-The original full build was manually stopped to move to another build machine.
-The full compile/link/modpost and binary packaging are not yet validated.
-No custom kernel was installed or booted. Module loading, diagnostic version 3,
-loss/reordering/ECN tests, sustained traffic, regressions, performance and reboot
-recovery tests remain to be performed. Treat this tree as experimental.
+These generic results do not establish that the new cloud configuration builds
+or boots correctly. Loss/reordering/ECN tests, sustained traffic, regressions,
+performance and cloud reboot-recovery tests remain outstanding. Experimental.
 
 The verifier checks byte offset 39 (bbr_version) of this tree's extended BBR
 TCP_CC_INFO layout on a fresh loopback connection. It checks version only,
