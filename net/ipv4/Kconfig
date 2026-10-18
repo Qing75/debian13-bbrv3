@@ -664,7 +664,7 @@ config TCP_CONG_CDG
 	    http://caia.swin.edu.au/cv/dahayes/content/networking2011-cdg-preprint.pdf
 
 config TCP_CONG_BBR
-	tristate "BBR TCP"
+	tristate "BBRv3 TCP (local Google v3 port)"
 	default n
 	help
 
